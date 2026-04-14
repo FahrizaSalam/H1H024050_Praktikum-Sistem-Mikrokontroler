@@ -1,1 +1,1 @@
-**Link Simulasi Tinkercad : **https://www.tinkercad.com/things/5iS5a5EG3bp-praktikum-sismik-pertemuan-2?sharecode=BfdBJhxDj1tuaxzvf5-lzQKpExtzQqonB481jetHD5M
+**Link Simulasi Tinkercad :**https://www.tinkercad.com/things/5iS5a5EG3bp-praktikum-sismik-pertemuan-2?sharecode=BfdBJhxDj1tuaxzvf5-lzQKpExtzQqonB481jetHD5M
