@@ -6,14 +6,14 @@
 
 ## Jawaban Pertanyaan Praktikum 2.6.4 (Percobaan 1B: Kontrol Counter Dengan Push Button)
 
-**Gambarkan rangkaian schematic yang digunakan pada percobaan!**
+**1. Gambarkan rangkaian schematic yang digunakan pada percobaan!**
 ![Skema Rangkaian](../Dokumentasi/Skema2B.png)
 
 **2. Mengapa pada push button digunakan mode `INPUT_PULLUP` pada Arduino Uno? Apa keuntungannya dibandingkan rangkaian biasa?**
 
 Penggunaan mode `INPUT_PULLUP` pada saat inisialisasi `pinMode()` bertujuan untuk mengaktifkan resistor pull-up internal (sekitar 20k Ohm) yang sudah tertanam di dalam mikrokontroler ATmega pada papan Arduino Uno. 
 
-**Keuntungannya:** * **Efisien secara Rangkaian (Hardware):** Kita tidak perlu lagi memasang resistor pull-up atau pull-down eksternal secara fisik di breadboard, sehingga rangkaian menjadi jauh lebih ringkas dan hemat kabel.
+**Keuntungannya:** **Efisien secara Rangkaian (Hardware):** Kita tidak perlu lagi memasang resistor pull-up atau pull-down eksternal secara fisik di breadboard, sehingga rangkaian menjadi jauh lebih ringkas dan hemat kabel.
 * **Mencegah Status Mengambang (Floating):** Menjamin bahwa saat push button tidak ditekan, pin Arduino akan membaca sinyal secara stabil di logika `HIGH` (karena ditarik ke 5V oleh resistor internal). Tanpa pull-up, pin akan berada dalam kondisi mengambang dan bisa secara acak membaca logika HIGH atau LOW akibat gangguan elektromagnetik di sekitarnya. 
 
 **3. Jika salah satu LED segmen tidak menyala, apa saja kemungkinan penyebabnya dari sisi hardware maupun software?**
