@@ -1,5 +1,3 @@
-# Laporan Praktikum Modul 2: Pemrograman GPIO
-
 **Nama** : Muhammad Aziz Ihza Fahriza Salam  
 **NIM** : H1H024050  
 **Mata Kuliah** : TK244005-Praktikum Sistem Mikrokontroller  
