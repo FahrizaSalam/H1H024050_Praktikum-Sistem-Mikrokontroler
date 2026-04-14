@@ -36,65 +36,84 @@ Selain tombol "UP" yang sudah terhubung ke **Pin 2**, tambahkan satu buah push b
 **Kode Program Lengkap (dengan penjelasan per baris):**
 
 ```cpp
-#include <Arduino.h>
-
-// Pemetaan urutan pin untuk dihubungkan ke kaki-kaki Seven Segment
+// Mendefinisikan array pin Arduino yang terhubung ke tiap segmen (A, B, C, D, E, F, G, DP)
 const int segmentPins[8] = {7, 6, 5, 11, 10, 8, 9, 4}; 
 
-const int btnUp = 2;   // Mendefinisikan Pin 2 sebagai input untuk tombol increment (tambah angka)
-const int btnDown = 3; // MODIFIKASI: Mendefinisikan Pin 3 sebagai input untuk tombol decrement (kurangi angka)
+const int btnNext = 3;  // Menentukan pin 3 untuk tombol maju (Next)
+const int btnPrev = 2;  // Menentukan pin 2 untuk tombol mundur (Prev)
 
-// Pola nyala biner LED angka 0-F untuk Seven Segment berjenis Common Cathode (1=Nyala, 0=Mati)
+int currentDigit = 0;             // Variabel untuk menyimpan angka/karakter yang sedang ditampilkan saat ini
+bool lastBtnNextState = HIGH;     // Menyimpan status sebelumnya dari tombol Next (HIGH berarti tidak ditekan)
+bool lastBtnPrevState = HIGH;     // Menyimpan status sebelumnya dari tombol Prev (HIGH berarti tidak ditekan)
+
+// Array 2 dimensi yang berisi pola nyala/mati (1/0) segmen untuk angka 0-9 dan huruf A-F (Hexadesimal)
 byte digitPattern[16][8] = {
-  {1,1,1,1,1,1,0,0}, {0,1,1,0,0,0,0,0}, {1,1,0,1,1,0,1,0}, {1,1,1,1,0,0,1,0}, 
-  {0,1,1,0,0,1,1,0}, {1,0,1,1,0,1,1,0}, {1,0,1,1,1,1,1,0}, {1,1,1,0,0,0,0,0}, 
-  {1,1,1,1,1,1,1,0}, {1,1,1,1,0,1,1,0}, {1,1,1,0,1,1,1,0}, {0,0,1,1,1,1,1,0}, 
-  {1,0,0,1,1,1,0,0}, {0,1,1,1,1,0,1,0}, {1,0,0,1,1,1,1,0}, {1,0,0,0,1,1,1,0}  
+  {1,1,1,1,1,1,0,0},  // Pola untuk angka 0
+  {0,1,1,0,0,0,0,0},  // Pola untuk angka 1
+  {1,1,0,1,1,0,1,0},  // Pola untuk angka 2
+  {1,1,1,1,0,0,1,0},  // Pola untuk angka 3
+  {0,1,1,0,0,1,1,0},  // Pola untuk angka 4
+  {1,0,1,1,0,1,1,0},  // Pola untuk angka 5
+  {1,0,1,1,1,1,1,0},  // Pola untuk angka 6
+  {1,1,1,0,0,0,0,0},  // Pola untuk angka 7
+  {1,1,1,1,1,1,1,0},  // Pola untuk angka 8
+  {1,1,1,1,0,1,1,0},  // Pola untuk angka 9
+  {1,1,1,0,1,1,1,0},  // Pola untuk huruf A
+  {0,0,1,1,1,1,1,0},  // Pola untuk huruf b
+  {1,0,0,1,1,1,0,0},  // Pola untuk huruf C
+  {0,1,1,1,1,0,1,0},  // Pola untuk huruf d
+  {1,0,0,1,1,1,1,0},  // Pola untuk huruf E
+  {1,0,0,0,1,1,1,0}   // Pola untuk huruf F
 };
 
-int currentDigit = 0;           // Variabel global untuk menyimpan posisi angka yang sedang aktif di layar (dimulai dari 0)
-bool lastUpState = HIGH;        // Menyimpan status memori tombol UP di siklus sebelumnya (HIGH karena pull-up default)
-bool lastDownState = HIGH;      // Menyimpan status memori tombol DOWN di siklus sebelumnya (HIGH karena pull-up default)
-
-// Fungsi khusus untuk menyalakan LED segmen sesuai dengan angka/huruf yang diminta di parameter
-void displayDigit(int num) {
-  for(int i=0; i<8; i++) {
-    digitalWrite(segmentPins[i], digitPattern[num][i]); // Menuliskan sinyal HIGH/LOW ke masing-masing pin
+// Fungsi khusus untuk menampilkan angka/karakter ke 7-segment berdasarkan indeksnya
+void displayDigit(int num)
+{
+  for(int i = 0; i < 8; i++) // Melakukan perulangan sebanyak 8 kali untuk ke-8 segmen
+  {
+    // Mengirim sinyal ke pin. Tanda '!' membalik logika (1 jadi LOW, 0 jadi HIGH). Cocok untuk tipe Common Anode.
+    digitalWrite(segmentPins[i], !digitPattern[num][i]); 
   }
 }
 
-void setup() {
-  for(int i=0; i<8; i++) {
-    pinMode(segmentPins[i], OUTPUT); // Melakukan perulangan untuk mengatur semua 8 pin Seven Segment sebagai OUTPUT
+void setup()
+{
+  for(int i = 0; i < 8; i++) // Melakukan perulangan untuk mengatur semua pin segmen
+  {
+    pinMode(segmentPins[i], OUTPUT); // Mengatur setiap pin segmen sebagai OUTPUT
   }
-  
-  pinMode(btnUp, INPUT_PULLUP);      // Menginisialisasi pin tombol UP dengan resistor internal Pull-Up agar sinyal stabil
-  pinMode(btnDown, INPUT_PULLUP);    // Menginisialisasi pin tombol DOWN dengan resistor internal Pull-Up agar sinyal stabil
-  
-  displayDigit(currentDigit);        // Mengeksekusi fungsi untuk menampilkan angka inisial (0) saat Arduino baru dinyalakan
+
+  pinMode(btnNext, INPUT_PULLUP); // Mengatur pin tombol Next sebagai INPUT dengan resistor pull-up internal
+  pinMode(btnPrev, INPUT_PULLUP); // Mengatur pin tombol Prev sebagai INPUT dengan resistor pull-up internal
+
+  displayDigit(currentDigit); // Menampilkan digit awal (yaitu 0) ke layar saat pertama menyala
 }
 
-void loop() {
-  // Membaca status kelistrikan dari kedua tombol saat ini (Pin akan terbaca LOW jika tombol sedang ditekan secara fisik)
-  bool upState = digitalRead(btnUp);
-  bool downState = digitalRead(btnDown);
+void loop()
+{
+  bool btnNextState = digitalRead(btnNext); // Membaca status tombol Next saat ini (ditekan = LOW)
+  bool btnPrevState = digitalRead(btnPrev); // Membaca status tombol Prev saat ini (ditekan = LOW)
 
-  if(lastUpState == HIGH && upState == LOW) { 
-    currentDigit++;                         // Menambah nilai variabel hitungan sebanyak 1
-    if(currentDigit > 15) currentDigit = 0; // Logika Rollover: Jika hitungan telah melewati batas atas (F/15), maka reset kembali ke angka 0
-    displayDigit(currentDigit);             // Segarkan tampilan di layar Seven Segment dengan angka terbaru
+  // Mengecek apakah tombol Next baru saja ditekan (transisi dari tidak ditekan/HIGH menjadi ditekan/LOW)
+  if(lastBtnNextState == HIGH && btnNextState == LOW) 
+  {
+    currentDigit++; // Menambah nilai digit sebanyak 1 (maju)
+    if(currentDigit > 15) currentDigit = 0; // Jika sudah melewati batas maksimal (15 atau F), kembali ke 0
+
+    displayDigit(currentDigit); // Memperbarui tampilan 7-segment dengan digit yang baru
+    delay(200); // Memberikan jeda 200ms untuk debouncing (mencegah tombol terbaca ditekan berkali-kali)
   }
 
-  if(lastDownState == HIGH && downState == LOW) {
-    currentDigit--;                         // Mengurangi nilai variabel hitungan sebanyak 1
-    if(currentDigit < 0) currentDigit = 15; // Logika Rollover mundur: Jika hitungan kurang dari 0, putar balik batas menjadi ke 15 (F)
-    displayDigit(currentDigit);             // Segarkan tampilan di layar Seven Segment dengan angka terbaru
+  // Mengecek apakah tombol Prev baru saja ditekan (transisi dari HIGH ke LOW)
+  if(lastBtnPrevState == HIGH && btnPrevState == LOW)
+  {
+    currentDigit--; // Mengurangi nilai digit sebanyak 1 (mundur)
+    if(currentDigit < 0) currentDigit = 15; // Jika kurang dari 0, melompat ke angka paling atas (15 atau F)
+
+    displayDigit(currentDigit); // Memperbarui tampilan 7-segment
+    delay(200); // Memberikan jeda 200ms untuk debouncing
   }
 
-  // Memperbarui riwayat status memori tombol saat ini untuk dijadikan perbandingan pada siklus loop per detik berikutnya
-  lastUpState = upState;     
-  lastDownState = downState; 
-  
-  // Memberikan jeda waktu eksekusi singkat 50 milidetik sebagai mekanisme perlindungan
-  delay(50); 
+  lastBtnNextState = btnNextState; // Menyimpan status tombol Next saat ini untuk perbandingan di loop berikutnya
+  lastBtnPrevState = btnPrevState; // Menyimpan status tombol Prev saat ini untuk perbandingan di loop berikutnya
 }
