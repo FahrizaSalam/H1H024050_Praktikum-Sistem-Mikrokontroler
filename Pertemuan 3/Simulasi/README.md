@@ -1,0 +1,1 @@
+## Link Simulasi : https://www.tinkercad.com/things/kzyFIucBMYH-praktikum-sismik-pertemuan-3?sharecode=hXF-MP8pUo73BJho3jfQjsbbB_xaxSSrgx8sGyKldiM
