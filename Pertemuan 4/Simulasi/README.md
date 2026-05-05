@@ -1,0 +1,1 @@
+# Link Simulasi Tinkercad : https://www.tinkercad.com/things/bbOYJPOCXCK-praktikum-sismik-pertemuan-4?sharecode=GB7_AtH_7d1mhL4keNjrIDg0INYyJzmA4UXIwDzGIB4
